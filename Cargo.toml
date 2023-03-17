@@ -8,3 +8,4 @@ edition = "2021"
 [dependencies]
 eframe = "0.21.3"
 egui = "0.21.0"
+jk_ban = { git = "https://github.com/JanSnoh/jk_ban", version = "0.1.0" }

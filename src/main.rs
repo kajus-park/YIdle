@@ -2,6 +2,8 @@ use eframe::egui;
 use eframe::App;
 use eframe::NativeOptions;
 use egui::CentralPanel;
+use jk_ban::BigNum;
+
 fn main() -> Result<(), eframe::Error> {
     let options = NativeOptions::default();
     eframe::run_native(
@@ -18,8 +20,15 @@ enum Screen {
 
 #[derive(Default)]
 struct IdleGame {
-    clicks: u128,
+    clicks: BigNum,
     open_screen: Screen,
+}
+
+#[test]
+fn test_ex(){
+    let mut i = BigNum::new(5,0);
+    i = i.pow(2.0);
+    assert_eq!(i, BigNum::new(25, 0));
 }
 
 impl App for IdleGame {
@@ -32,7 +41,13 @@ impl App for IdleGame {
                         ui.separator();
                         ui.label(format!("Clicks: {}", self.clicks));
                         if ui.button("Click").clicked() {
-                            self.clicks += 1;
+                            self.clicks.increment();
+                        }
+                        if ui.button("Double").clicked() {
+                            self.clicks=self.clicks*2u128.into();
+                        }
+                        if ui.button("Square").clicked() {
+                            self.clicks=self.clicks.pow(2.0);
                         }
                     });
                 });
