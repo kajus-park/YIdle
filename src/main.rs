@@ -1,8 +1,8 @@
-use eframe::egui;
-use eframe::App;
-use eframe::NativeOptions;
+#![windows_subsystem = "windows"]
+use eframe::{egui, App, NativeOptions};
 use egui::CentralPanel;
 use jk_ban::BigNum;
+
 
 fn main() -> Result<(), eframe::Error> {
     let options = NativeOptions::default();
@@ -22,13 +22,8 @@ enum Screen {
 struct IdleGame {
     clicks: BigNum,
     open_screen: Screen,
-}
-
-#[test]
-fn test_ex(){
-    let mut i = BigNum::new(5,0);
-    i = i.pow(2.0);
-    assert_eq!(i, BigNum::new(25, 0));
+    clicker1: BigNum,  
+    update_thread: Option<std::thread::JoinHandle<()>>,
 }
 
 impl App for IdleGame {
@@ -40,18 +35,31 @@ impl App for IdleGame {
                         ui.label("Click to your hearts content!");
                         ui.separator();
                         ui.label(format!("Clicks: {}", self.clicks));
+                        ui.label(format!("Clickers: {}", self.clicker1));
+                        ui.separator();
                         if ui.button("Click").clicked() {
                             self.clicks.increment();
                         }
-                        if ui.button("Double").clicked() {
-                            self.clicks=self.clicks*2u128.into();
+                        if ui.button("+1 Clicker").clicked() {
+                            self.clicker1.increment();
                         }
                         if ui.button("Square").clicked() {
-                            self.clicks=self.clicks.pow(2.0);
+                            self.clicks = self.clicks.pow(2.0);
+                        }
+                        if ui.button("Square Clicker").clicked() {
+                            self.clicker1 = self.clicker1.pow(2.0);
                         }
                     });
                 });
             }
+        }
+
+        self.clicks = self.clicks + self.clicker1;
+        let ctx_clone = ctx.clone();
+        if let None = self.update_thread {
+            self.update_thread = Some(std::thread::spawn(move || loop {
+                ctx_clone.request_repaint();
+            }))
         }
     }
 }
